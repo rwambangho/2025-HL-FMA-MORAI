@@ -1,0 +1,4 @@
+<launch>
+  <rosparam command="load" file="$(find dgaja)/config/params.yaml"/>
+  <node pkg="dgaja" type="my_driver.py" name="my_driver" output="screen"/>
+</launch>

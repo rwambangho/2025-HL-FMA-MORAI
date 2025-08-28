@@ -1,0 +1,18 @@
+<launch>
+  <!-- 카메라 토픽 인자 -->
+  <arg name="cam" default="/image_jpeg/compressed"/>
+  <arg name="imu"       default="/imu"/>
+  <arg name="gps"       default="/gps"/>
+  <arg name="ctrl"      default="/ctrl_cmd"/>
+
+  <!-- 파라미터 로드 -->
+  <rosparam command="load" file="$(find dgaja)/config/params2.yaml" />
+
+  <!-- 드라이버 실행 -->
+  <node pkg="dgaja" type="my_driver2.py" name="my_driver2" output="screen">
+    <param name="topics/cam"       value="$(arg cam)"/>
+    <param name="topics/imu"       value="$(arg imu)"/>
+    <param name="topics/gps"       value="$(arg gps)"/>
+    <param name="topics/ctrl_cmd"  value="$(arg ctrl)"/>
+  </node>
+</launch>

@@ -1,0 +1,29 @@
+vehicle:
+  wheelbase: 2.6
+  max_accel: 0.8
+  max_brake: 0.6
+  target_speed: 5.0    # m/s (≈18km/h)
+
+lane:
+  use_roi: false       # true면 ROI 사다리꼴 적용
+  roi_y1: 300          # 네 코드의 ROI (픽셀)
+  roi_y2: 380
+  canny_low: 60
+  canny_high: 75
+  hough_thresh: 50
+  hough_min_len: 50
+  hough_max_gap: 20
+  mid_row: 40          # L_ROW
+
+topics:
+  image: "/image_jpeg/compressed"   # MORAI 카메라
+  ego:   "/Ego_topic"               # morai_msgs/EgoVehicleStatus
+  cmd:   "/ctrl_cmd"                # morai_msgs/CtrlCmd
+
+timeouts:
+  ego_sec: 1.0
+  path_sec: 1.0
+
+extras:
+  use_ultra: false     # 네 코드의 초음파/AR 사용 여부 (MORAI 기본 X)
+  use_ar: false

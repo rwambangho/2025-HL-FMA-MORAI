@@ -1,0 +1,31 @@
+vehicle:
+  wheelbase: 2.6
+  max_accel: 0.8
+  max_brake: 0.6
+  min_speed: 1.5
+  max_speed: 8.0
+
+ctrl:
+  k_steer: 0.7
+  k_soft: 1.0
+  kp_speed: 0.4
+  curve_k: 5.0
+  curve_min_v: 2.0
+
+roi:
+  h_bottom: 1.0
+  h_top: 0.5
+
+hsv:
+  white_low:  [0, 0, 200]
+  white_high: [180, 30, 255]
+  yel_low:    [20, 100, 100]
+  yel_high:   [30, 255, 255]
+  red1_low:   [0, 80, 80]
+  red1_high:  [10, 255, 255]
+  red2_low:   [170, 80, 80]
+  red2_high:  [180, 255, 255]
+  green_low:  [40, 80, 80]
+  green_high: [90, 255, 255]
+  yellow_low: [15, 120, 120]
+  yellow_high: [35, 255, 255]
