@@ -47,6 +47,7 @@ Model : 2023_Hyundai_ioniq5
 
 ## 시스템 구조
 
+<img width="2210" height="1626" alt="output" src="https://github.com/user-attachments/assets/f03ed289-bd91-47de-879d-44f947b4f428" />
 
 ## 주요 코드
 
