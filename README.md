@@ -30,24 +30,24 @@ Model : 2023_Hyundai_ioniq5
   - Data Rate :  자유
   - 네트워크 : ROS
 - 3D LIDAR
-  - 개수 : 최대 2대
-  - Model : VLP16 or HDL32
+  - 개수 : 1대
+  - Model : VLP16
   - Intensity type : Intensity
   - Rotation Rate : 자유
-  - 네트워크 : ROS
+  - 네트워크 : UDP
 - Camera
   - 개수 : 1대
   - Model : Camera
   - Ground Truth : None
-  - Viz Bounding Box(2D/3D) : 해제
-  - 해상도 : 자유
+  - Viz Bounding Box(2D/3D) : x
+  - 해상도 : 640*480
   - Frame Rate : 자유
-  - 네트워크 : UDP or ROS
+  - 네트워크 : ROS
 
 
 ## 시스템 구조
 
-<img width="2210" height="1626" alt="output" src="https://github.com/user-attachments/assets/f03ed289-bd91-47de-879d-44f947b4f428" />
+<img width="593" height="572" alt="morai drawio" src="https://github.com/user-attachments/assets/9b1bb48e-208c-4411-b18a-a8af8fed3d02" />
 
 ## 주요 코드
 
