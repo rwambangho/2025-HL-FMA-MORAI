@@ -1,4 +1,14 @@
 <launch>
-  <rosparam command="load" file="$(find dgaja)/config/params.yaml"/>
-  <node pkg="dgaja" type="my_driver.py" name="my_driver" output="screen"/>
+    <!-- Global Path Publisher (link_set.json → txt 변환된 path.txt 활용) -->
+    <node pkg="dgaja" type="global_path_pub.py" name="global_path_pub" output="screen" />
+
+    <!-- Local Path Publisher -->
+    <node pkg="dgaja" type="local_path_pub.py" name="local_path_pub" output="screen" />
+
+    <!-- Pure Pursuit with PID + Velocity Planning -->
+    <node pkg="dgaja" type="pure_pursuit_pid_velocity_planning.py" name="pure_pursuit_ctrl" output="screen" />
+
+    <!-- Mission Manager (main code for autonomous driving mission) -->
+    <node pkg="dgaja" type="mission_drive.py" name="mission_drive" output="screen" />
+
 </launch>

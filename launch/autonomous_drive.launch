@@ -1,0 +1,23 @@
+<launch>
+    <!-- ========== Sensors ========== -->
+    <!-- GPS + IMU → /odom -->
+    <node pkg="dgaja" type="gpsimu_parser.py" name="gpsimu_parser" output="screen" />
+
+    <!-- Camera → Lane Path -->
+    <node pkg="dgaja" type="lane_fitting.py" name="lane_fitting" output="screen" />
+
+    <!-- LiDAR → Detected Objects -->
+    <node pkg="dgaja" type="velodyne_cluster.py" name="velodyne_clustering" output="screen" />
+
+    <!-- ========== Path Planning ========== -->
+    <!-- Global Path Publisher -->
+    <node pkg="dgaja" type="global_path_pub.py" name="global_path_pub" output="screen" />
+
+    <!-- Local Path Publisher -->
+    <node pkg="dgaja" type="local_path_pub.py" name="local_path_pub" output="screen" />
+
+    <!-- ========== Mission & Control ========== -->
+    <!-- Main Node: Pure Pursuit + Mission (signal, obstacle, stop line, etc.) -->
+    <node pkg="dgaja" type="mission_drive.py" name="mission_drive" output="screen" />
+
+</launch>
