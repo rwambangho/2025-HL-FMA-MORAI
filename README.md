@@ -29,7 +29,7 @@
   - 개수 : 1대
   - Model : VLP16
   - Intensity type : Intensity
-  - 네트워크 : UDP
+  - 네트워크 : ROS
 - Camera
   - 개수 : 1대
   - Model : Camera
