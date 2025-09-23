@@ -16,7 +16,7 @@ class SCANCluster:
         self.scan_sub = rospy.Subscriber("/lidar3D", PointCloud2, self.callback)
         self.clusterpoints_pub = rospy.Publisher("/cluster_points", PointCloud2, queue_size=10)
         self.pc_np = None
-        self.dbscan = DBSCAN(eps=0.5, min_samples=5)
+        self.dbscan = DBSCAN(eps=0.8, min_samples=4) #eps는 차량 너비(2m)의 절반 정도를 기준으로 시작 (0.8 ~ 1.0)
 
     def callback(self, msg):
         self.pc_np = self.pointcloud2_to_xyz(msg)
@@ -31,6 +31,9 @@ class SCANCluster:
         for c in range(n_cluster):
             c_tmp = np.mean(pc_xy[db==c, :], axis=0)
             cluster_points.append([c_tmp[0], c_tmp[1], 1])  # Adding Z coordinate as 1
+
+             # 📌 클러스터 중심 좌표 출력
+            rospy.loginfo(f"[Cluster] {c}: X={c_tmp[0]:.2f}, Y={c_tmp[1]:.2f}")
 
         self.publish_point_cloud(cluster_points)
 
@@ -56,7 +59,12 @@ class SCANCluster:
         for point in pc2.read_points(cloud_msg, skip_nans=True):
             dist = np.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
             angle = np.arctan2(point[1], point[0])
-            if point[0] > 0 and 1.50 > point[2] > -1.25 and dist < 50:
+            if ( #자차 바디가 클러스터로 인식/도로 옆 벽, 난간 등이 인식/멀리 있는 큰 물체들이 전체 클러스터로 묶임 방지
+                point[0] > 1.5 and  # 차량 앞 1.5m 이상
+                abs(point[1]) < 3.0 and  # 좌우 3m 내
+                1.5 > point[2] > -1.25 and  # 높이 필터
+                dist < 50
+            ):
                 point_list.append((point[0], point[1], point[2], point[3], dist, angle))
 
         point_np = np.array(point_list, np.float32)

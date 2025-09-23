@@ -99,7 +99,7 @@ class PathTracker:
     def drive(self, steering_rad: float, target_velocity: float):
         rospy.loginfo_throttle(1.0, f"[Drive] Steering: {steering_rad:.2f} rad, Velocity: {target_velocity:.2f} km/h")
         cmd = CtrlCmd()
-        cmd.longlCmdType = 2
+        cmd.longlCmdType = 1
         cmd.velocity = self.target_velocity
         cmd.steering = float(steering_rad)
         self.ctrl_pub.publish(cmd)
