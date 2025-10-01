@@ -53,6 +53,7 @@ class MissionDrive:
         self.lane_half_width = 2.0 # 차선 중심에서 좌우 범위
         self.clear_count = 0       # 장애물 클리어 프레임 카운트
         self.clear_threshold = 5   # N프레임 연속 clear 시 재출발
+        self.curvature_threshold = 0.05
 
         # --- 초기 Service Call (기어 D, 자동 제어 모드) ---
         self.set_event_cmd()
@@ -102,8 +103,8 @@ class MissionDrive:
     def run(self):
         
         if not self.local_path or len(self.local_path.poses) == 0:
-        rospy.logwarn_throttle(1.0, "[MissionDrive] No local path available")
-        return
+            rospy.logwarn_throttle(1.0, "[MissionDrive] No local path available")
+            return
 
         # (1) 기본 경로 추종 조향각 (local_path 기준)
         steering = self.calc_pure_pursuit(self.local_path)
@@ -124,14 +125,14 @@ class MissionDrive:
         target_speed = self.max_speed
 
         # (1) 전방 커브 구간 감지 → 감속
-        curvature = self.estimate_path_curvature(path)
+        curvature = self.estimate_path_curvature(self.local_path)
         if curvature > self.curvature_threshold:
             target_speed = min(target_speed, 10.0)  # 커브 시 속도 감속
             rospy.loginfo("🚧 Curve detected: Slowing down")
 
         # (2) 전방 신호등 거리 계산 → 감속
         if self.traffic_status in [1, 4]:  # 적색 or 황색
-            dist_to_signal = self.estimate_distance_to_signal(path)
+            dist_to_signal = self.estimate_distance_to_signal(self.local_path)
             if dist_to_signal < 30.0:  # 신호등까지 30m 이내
                 target_speed = min(target_speed, 10.0)
                 rospy.loginfo(f"🚦 Signal ahead ({dist_to_signal:.1f}m): Slowing down")
@@ -145,53 +146,50 @@ class MissionDrive:
         self.ctrl_pub.publish(self.ctrl_cmd)
 
     def compute_lane_offset(self, local_path, lane_path):
-    """
-    local_path와 lane_path의 시작점 차이를 이용해 lateral offset 계산
-    """
-    try:
-        lx = local_path.poses[0].pose.position.x
-        ly = local_path.poses[0].pose.position.y
-        cx = lane_path.poses[0].pose.position.x
-        cy = lane_path.poses[0].pose.position.y
+        try:
+            lx = local_path.poses[0].pose.position.x
+            ly = local_path.poses[0].pose.position.y
+            cx = lane_path.poses[0].pose.position.x
+            cy = lane_path.poses[0].pose.position.y
 
-        return cy - ly  # lateral offset
-    except:
-        return 0.0
+            return cy - ly  # lateral offset
+        except:
+            return 0.0
 
-def estimate_path_curvature(self, path, lookahead=10):
-    """
-    앞쪽 N개의 포인트를 기반으로 경로의 곡률을 추정
-    """
-    if len(path.poses) < lookahead:
-        return 0.0
+    def estimate_path_curvature(self, path, lookahead=10):
+        """
+        앞쪽 N개의 포인트를 기반으로 경로의 곡률을 추정
+        """
+        if len(path.poses) < lookahead:
+            return 0.0
 
-    angles = []
-    for i in range(1, lookahead):
-        p1 = path.poses[i-1].pose.position
-        p2 = path.poses[i].pose.position
-        dx = p2.x - p1.x
-        dy = p2.y - p1.y
-        angle = math.atan2(dy, dx)
-        angles.append(angle)
+        angles = []
+        for i in range(1, lookahead):
+            p1 = path.poses[i-1].pose.position
+            p2 = path.poses[i].pose.position
+            dx = p2.x - p1.x
+            dy = p2.y - p1.y
+            angle = math.atan2(dy, dx)
+            angles.append(angle)
 
-    deltas = [abs(angles[i+1] - angles[i]) for i in range(len(angles)-1)]
-    return sum(deltas) / len(deltas)  # 평균 조향각 변화량
+        deltas = [abs(angles[i+1] - angles[i]) for i in range(len(angles)-1)]
+        return sum(deltas) / len(deltas)  # 평균 조향각 변화량
 
-def estimate_distance_to_signal(self, path):
-    """
-    현재 차량 위치 기준으로 경로 상 신호등까지의 거리 추정
-    (조건: 신호등 좌표 또는 위치 인덱스가 명확히 지정되어 있어야 함)
-    """
-    if not path or not path.poses:
-        return float('inf')
+    def estimate_distance_to_signal(self, path):
+        """
+        현재 차량 위치 기준으로 경로 상 신호등까지의 거리 추정
+        (조건: 신호등 좌표 또는 위치 인덱스가 명확히 지정되어 있어야 함)
+        """
+        if not path or not path.poses:
+            return float('inf')
 
-    # 예시: 신호등 위치 (수동 설정 or 별도 노드로 계산)
-    signal_x, signal_y = self.traffic_light_pos.x, self.traffic_light_pos.y
+        # 예시: 신호등 위치 (수동 설정 or 별도 노드로 계산)
+        signal_x, signal_y = 0.001, 0.178
 
-    # 현재 위치로부터의 거리 계산
-    dx = signal_x - self.vehicle_pos.x
-    dy = signal_y - self.vehicle_pos.y
-    return math.hypot(dx, dy)
+        # 현재 위치로부터의 거리 계산
+        dx = signal_x - self.vehicle_pos.x
+        dy = signal_y - self.vehicle_pos.y
+        return math.hypot(dx, dy)
 
 
     # ----------------- Pure Pursuit -----------------
